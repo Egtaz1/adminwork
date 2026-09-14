@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>لوحة الإدارة | نظام إدارة أيام العمل</title>
 <style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
 
@@ -395,6 +395,281 @@ a { color: inherit; text-decoration: none; }
 .loading-spinner{width:38px;height:38px;border:4px solid #eceef4;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:700px){.admin-gate .form-grid{grid-template-columns:1fr}.admin-gate .form-group.full{grid-column:auto}}
+
+
+/* =========================================================
+   Professional Mobile / WebView Responsive Layer
+   يحافظ على تصميم سطح المكتب ويعيد ترتيب الواجهة بالكامل للهاتف
+   ========================================================= */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+body { overscroll-behavior-x: none; }
+img, svg { max-width: 100%; }
+.app-shell, .main-wrap, .content, .page-section,
+.card, .card-body, .card-grid-2, .card-grid-main,
+.toolbar, .filter-row, .form-grid { min-width: 0; }
+
+/* يمنع النصوص الطويلة والأرقام من كسر البطاقات */
+.stat-card, .quick-stat, .salary-line, .user-cell,
+.profile-meta, .topbar-title { min-width: 0; }
+.stat-value, .salary-line strong, .user-title, .user-sub {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* تحسين لمس الموبايل */
+@media (hover: none) and (pointer: coarse) {
+  .btn:hover, .day-card:hover { transform: none; }
+  .btn, .icon-btn, .nav-link, .input, .select { min-height: 46px; }
+}
+
+@media (max-width: 920px) {
+  body { background: #f5f7fb; }
+
+  /* شاشة دخول المدير */
+  .login-form-wrap {
+    width: 100%;
+    min-height: 100dvh;
+    padding: max(22px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+    align-items: center;
+  }
+  .login-card { width: 100%; max-width: 520px; }
+  .login-card h2 { font-size: clamp(24px, 7vw, 30px); }
+  .login-card > p { margin-bottom: 22px; }
+
+  /* القائمة الجانبية تصبح Drawer حقيقية */
+  .sidebar {
+    width: min(86vw, 310px);
+    max-width: 310px;
+    height: 100dvh;
+    padding: max(18px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+    box-shadow: -18px 0 45px rgba(16,24,40,.22);
+    overscroll-behavior: contain;
+  }
+  .sidebar .brand-lockup { padding: 4px 8px 18px; }
+  .nav-link { min-height: 46px; font-size: 13px; }
+  .overlay.is-open { display: block; backdrop-filter: blur(2px); }
+
+  /* شريط أعلى متزن داخل WebView */
+  .topbar {
+    min-height: 66px;
+    height: auto;
+    padding: max(9px, env(safe-area-inset-top)) 12px 9px;
+    gap: 8px;
+  }
+  .topbar > div:first-child { flex: 1 1 auto; min-width: 0; }
+  .topbar-title { min-width: 0; }
+  .topbar-title h1 {
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-actions { flex: 0 0 auto; gap: 6px; }
+  .mobile-menu, .topbar .icon-btn { width: 42px; height: 42px; min-height: 42px; }
+
+  /* محتوى الصفحة */
+  .content {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px 12px calc(28px + env(safe-area-inset-bottom));
+  }
+  .page-head {
+    margin-bottom: 16px;
+    gap: 12px;
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .page-head h2 { font-size: 19px; }
+  .page-head p { line-height: 1.8; }
+  .page-actions { width: 100%; }
+  .page-actions .btn { width: 100%; }
+
+  /* البطاقات */
+  .card, .stat-card, .quick-stat { border-radius: 16px; }
+  .card-header {
+    min-height: 0;
+    padding: 14px;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .card-header h3 { font-size: 13px; }
+  .card-header p { line-height: 1.7; }
+  .card-body { padding: 14px; }
+  .card-grid-2, .card-grid-main { grid-template-columns: minmax(0,1fr); gap: 12px; }
+
+  /* الفلاتر والبحث لا تتزاحم */
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .search-box { width: 100%; max-width: none; min-width: 0; }
+  .filter-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .filter-row .select { width: 100%; min-width: 0; }
+
+  /* حقول مناسبة للموبايل، و16px لمنع zoom في iOS */
+  .input, .select {
+    width: 100%;
+    max-width: 100%;
+    min-height: 48px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+  .form-grid { grid-template-columns: minmax(0,1fr); gap: 13px; }
+  .form-group.full { grid-column: auto; }
+
+  /* الإحصائيات */
+  .stat-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-value { font-size: clamp(18px, 5vw, 22px); }
+  .quick-stats { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+
+  /* الأزرار داخل الجداول */
+  .table-actions { flex-wrap: wrap; justify-content: flex-start; }
+  .table-actions .btn { min-height: 38px; }
+
+  /* النافذة المنبثقة تصبح Bottom Sheet أنيقة */
+  .modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal-dialog, .modal-dialog.sm {
+    width: 100%;
+    max-width: none;
+    max-height: 92dvh;
+    border-radius: 22px 22px 0 0;
+    overscroll-behavior: contain;
+  }
+  .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(10px);
+    padding: 15px 16px;
+  }
+  .modal-body { padding: 16px; }
+  .modal-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(10px);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  .modal-footer .btn { flex: 1 1 0; }
+
+  /* رسائل التنبيه */
+  .toast-host {
+    top: max(12px, env(safe-area-inset-top));
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+  .toast { width: 100%; min-width: 0; max-width: none; }
+}
+
+/* تحويل جداول الإدارة إلى بطاقات موبايل بدل التمرير الأفقي */
+@media (max-width: 720px) {
+  .table-wrap { overflow: visible; width: 100%; }
+  .table {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    border-collapse: separate;
+  }
+  .table thead { display: none; }
+  .table tbody { display: grid; gap: 10px; width: 100%; }
+  .table tbody tr {
+    display: block;
+    width: 100%;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(16,24,40,.035);
+  }
+  .table tbody td {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #edf0f4;
+    display: grid;
+    grid-template-columns: minmax(78px, 96px) minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    text-align: right;
+    font-size: 12px;
+  }
+  .table tbody td:last-child { border-bottom: 0; }
+  .table tbody td::before {
+    content: attr(data-label);
+    color: #7a8392;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.5;
+  }
+  .table tbody td[colspan] {
+    display: block;
+    padding: 0;
+    border-bottom: 0;
+  }
+  .table tbody td[colspan]::before { content: none; }
+  .user-cell { min-width: 0; width: 100%; }
+  .user-cell > div:last-child { min-width: 0; }
+  .user-title, .user-sub {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .table-actions {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 42px;
+    width: 100%;
+    gap: 7px;
+  }
+  .table-actions .btn { width: 100%; }
+}
+
+@media (max-width: 560px) {
+  .content { padding-inline: 10px; }
+  .filter-row { grid-template-columns: minmax(0,1fr); }
+  .stat-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .stat-card { padding: 12px; }
+  .stat-top { gap: 8px; }
+  .stat-icon { width: 36px; height: 36px; border-radius: 11px; }
+  .stat-label { font-size: 10px; }
+  .stat-note { font-size: 9px; }
+  .salary-line { align-items: flex-start; }
+
+  /* على الهواتف الصغيرة: زر الخروج يبقى أيقونة حتى لا يضغط العنوان */
+  #logoutBtn {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    font-size: 0;
+  }
+  #logoutBtn svg { width: 18px; height: 18px; }
+}
+
+@media (max-width: 390px) {
+  .stat-grid { grid-template-columns: minmax(0,1fr); }
+  .quick-stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .topbar { padding-inline: 8px; }
+  .content { padding-inline: 8px; }
+  .card-header, .card-body { padding-inline: 12px; }
+}
+
 </style>
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 </head>
@@ -1325,10 +1600,10 @@ async function renderDashboard() {
 
   qs('latestUsersBody').innerHTML = latest.length ? latest.map(user => `
     <tr>
-      <td><div class="user-cell"><div class="avatar">${AppUtils.escapeHTML(initials(user.fullName))}</div><div><div class="user-title">${AppUtils.escapeHTML(user.fullName)}</div><div class="user-sub">موظف</div></div></div></td>
-      <td>${AppUtils.escapeHTML(user.username)}</td>
-      <td><span class="badge ${user.active ? 'badge-success' : 'badge-danger'}">${user.active ? 'نشط' : 'موقوف'}</span></td>
-      <td>${formatDate(user.createdAt)}</td>
+      <td data-label="المستخدم"><div class="user-cell"><div class="avatar">${AppUtils.escapeHTML(initials(user.fullName))}</div><div><div class="user-title">${AppUtils.escapeHTML(user.fullName)}</div><div class="user-sub">موظف</div></div></div></td>
+      <td data-label="اسم الدخول">${AppUtils.escapeHTML(user.username)}</td>
+      <td data-label="الحالة"><span class="badge ${user.active ? 'badge-success' : 'badge-danger'}">${user.active ? 'نشط' : 'موقوف'}</span></td>
+      <td data-label="تاريخ الإضافة">${formatDate(user.createdAt)}</td>
     </tr>`).join('') : `<tr><td colspan="4"><div class="empty-state"><h4>لا يوجد مستخدمون بعد</h4><p>أضف أول مستخدم من زر إضافة مستخدم.</p></div></td></tr>`;
 }
 
@@ -1351,11 +1626,11 @@ function renderUsersTable() {
 
   body.innerHTML = users.map(user => `
     <tr>
-      <td><div class="user-cell"><div class="avatar">${AppUtils.escapeHTML(initials(user.fullName))}</div><div><div class="user-title">${AppUtils.escapeHTML(user.fullName)}</div><div class="user-sub">${AppUtils.escapeHTML(user.id)}</div></div></div></td>
-      <td>${AppUtils.escapeHTML(user.username)}</td>
-      <td><span class="badge ${user.active ? 'badge-success' : 'badge-danger'}">${user.active ? 'نشط' : 'موقوف'}</span></td>
-      <td>${formatDate(user.createdAt)}</td>
-      <td><div class="table-actions">
+      <td data-label="المستخدم"><div class="user-cell"><div class="avatar">${AppUtils.escapeHTML(initials(user.fullName))}</div><div><div class="user-title">${AppUtils.escapeHTML(user.fullName)}</div><div class="user-sub">${AppUtils.escapeHTML(user.id)}</div></div></div></td>
+      <td data-label="اسم الدخول">${AppUtils.escapeHTML(user.username)}</td>
+      <td data-label="الحالة"><span class="badge ${user.active ? 'badge-success' : 'badge-danger'}">${user.active ? 'نشط' : 'موقوف'}</span></td>
+      <td data-label="تاريخ الإضافة">${formatDate(user.createdAt)}</td>
+      <td data-label="إجراءات"><div class="table-actions">
         <button class="btn btn-ghost btn-sm" data-edit-user="${user.id}"><i data-lucide="pencil"></i> تعديل</button>
         <button class="btn btn-danger btn-sm" data-delete-user="${user.id}" title="حذف المستخدم من النظام"><i data-lucide="trash-2"></i></button>
       </div></td>
