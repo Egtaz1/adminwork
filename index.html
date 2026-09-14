@@ -457,6 +457,7 @@ a { color: inherit; text-decoration: none; }
         <button class="nav-link" data-section="reports"><i data-lucide="chart-no-axes-combined"></i><span>تقارير المستخدمين</span></button>
 
         <div class="nav-section-title">النظام</div>
+        <button class="nav-link" data-section="account"><i data-lucide="user-cog"></i><span>حساب المدير</span></button>
         <button class="nav-link" data-section="settings"><i data-lucide="settings-2"></i><span>إعدادات التطبيق</span></button>
       </nav>
 
@@ -558,6 +559,44 @@ a { color: inherit; text-decoration: none; }
                 <div class="stat-card"><div class="stat-label">الصافي النهائي</div><div class="stat-value" id="repNet">0</div><div class="stat-note" id="repDiscount">قيمة الخصم: 0</div></div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section class="page-section" id="section-account">
+          <div class="page-head">
+            <div><h2>حساب المدير</h2><p>تعديل اسم المدير واسم المستخدم وكلمة المرور الرئيسية.</p></div>
+          </div>
+
+          <div class="card-grid-2">
+            <form id="adminProfileForm" class="card">
+              <div class="card-header">
+                <div><h3>بيانات المدير</h3><p>غيّر الاسم الظاهر واسم المستخدم المستخدم في تسجيل الدخول.</p></div>
+                <div class="stat-icon primary"><i data-lucide="user-cog"></i></div>
+              </div>
+              <div class="card-body">
+                <div class="form-grid">
+                  <div class="form-group full"><label for="adminProfileFullName">اسم المدير</label><input class="input" id="adminProfileFullName" maxlength="100" required></div>
+                  <div class="form-group full"><label for="adminProfileUsername">اسم المستخدم</label><input class="input" id="adminProfileUsername" maxlength="50" autocomplete="username" required><div class="help-text">بعد الحفظ استخدم اسم المستخدم الجديد في مرات تسجيل الدخول القادمة.</div></div>
+                </div>
+              </div>
+              <div class="modal-footer"><button class="btn btn-primary" id="saveAdminProfileBtn" type="submit"><i data-lucide="save"></i> حفظ بيانات المدير</button></div>
+            </form>
+
+            <form id="adminPasswordForm" class="card">
+              <div class="card-header">
+                <div><h3>تغيير كلمة المرور</h3><p>أدخل كلمة المرور الحالية أولًا لحماية حساب المدير.</p></div>
+                <div class="stat-icon warning"><i data-lucide="key-round"></i></div>
+              </div>
+              <div class="card-body">
+                <div class="form-grid">
+                  <div class="form-group full"><label for="adminCurrentPassword">كلمة المرور الحالية</label><input class="input" id="adminCurrentPassword" type="password" autocomplete="current-password" required></div>
+                  <div class="form-group"><label for="adminNewPassword">كلمة المرور الجديدة</label><input class="input" id="adminNewPassword" type="password" minlength="6" autocomplete="new-password" required></div>
+                  <div class="form-group"><label for="adminConfirmPassword">تأكيد كلمة المرور الجديدة</label><input class="input" id="adminConfirmPassword" type="password" minlength="6" autocomplete="new-password" required></div>
+                </div>
+                <div class="help-text">يجب ألا تقل كلمة المرور الجديدة عن 6 أحرف.</div>
+              </div>
+              <div class="modal-footer"><button class="btn btn-primary" id="changeAdminPasswordBtn" type="submit"><i data-lucide="shield-check"></i> تغيير كلمة المرور</button></div>
+            </form>
           </div>
         </section>
 
@@ -843,6 +882,45 @@ const DataService = {
       batch.set(doc(db, COLLECTIONS.loginIndex, newKey), currentIndexSnap.data());
       batch.delete(doc(db, COLLECTIONS.loginIndex, oldKey));
     }
+    await batch.commit();
+    return this.getUserById(id);
+  },
+
+  async updateAdminProfile(id, patch) {
+    const signedUser = auth.currentUser || await Auth.waitForAuthUser();
+    if (!signedUser || signedUser.uid !== id) throw new Error('جلسة المدير غير صالحة. سجّل الدخول مرة أخرى.');
+
+    const current = await this.getUserById(id);
+    if (!current || current.role !== 'admin') throw new Error('حساب المدير غير موجود.');
+
+    const nextFullName = cleanString(patch.fullName, 100);
+    const nextUsername = cleanString(patch.username, 50);
+    const nextNormalized = normalizeUsername(nextUsername);
+    if (!nextFullName || !nextUsername) throw new Error('اسم المدير واسم المستخدم مطلوبان.');
+
+    const oldKey = usernameDocKey(current.username);
+    const newKey = usernameDocKey(nextUsername);
+    const currentIndexSnap = await getDoc(doc(db, COLLECTIONS.loginIndex, oldKey));
+    if (!currentIndexSnap.exists()) throw new Error('بيانات تسجيل دخول المدير غير مكتملة.');
+
+    if (newKey !== oldKey) {
+      const newIndexSnap = await getDoc(doc(db, COLLECTIONS.loginIndex, newKey));
+      if (newIndexSnap.exists()) throw new Error('اسم المستخدم الجديد مستخدم بالفعل. اختر اسمًا آخر.');
+    }
+
+    const batch = writeBatch(db);
+    batch.update(doc(db, COLLECTIONS.users, id), {
+      fullName: nextFullName,
+      username: nextUsername,
+      usernameNormalized: nextNormalized,
+      updatedAt: serverTimestamp()
+    });
+
+    if (newKey !== oldKey) {
+      batch.set(doc(db, COLLECTIONS.loginIndex, newKey), currentIndexSnap.data());
+      batch.delete(doc(db, COLLECTIONS.loginIndex, oldKey));
+    }
+
     await batch.commit();
     return this.getUserById(id);
   },
@@ -1159,6 +1237,7 @@ function setupNavigation() {
     dashboard: 'نظرة عامة',
     users: 'إدارة المستخدمين',
     reports: 'تقارير المستخدمين',
+    account: 'حساب المدير',
     settings: 'إعدادات التطبيق'
   };
 
@@ -1204,6 +1283,7 @@ async function loadAdminData() {
   renderUsersTable();
   populateReportFilters();
   populateSettingsForm();
+  populateAdminAccountForm();
   await refreshReport();
   AppUtils.initIcons();
 }
@@ -1396,6 +1476,60 @@ async function saveSettings(event) {
   }
 }
 
+function populateAdminAccountForm() {
+  if (!adminSession) return;
+  qs('adminProfileFullName').value = adminSession.fullName || '';
+  qs('adminProfileUsername').value = adminSession.username || '';
+}
+
+async function saveAdminProfile(event) {
+  event.preventDefault();
+  const button = qs('saveAdminProfileBtn');
+  const fullName = qs('adminProfileFullName').value.trim();
+  const username = qs('adminProfileUsername').value.trim();
+
+  if (!fullName || !username) return AppUtils.toast('اكتب اسم المدير واسم المستخدم.', 'error');
+
+  button.disabled = true;
+  try {
+    const updated = await DataService.updateAdminProfile(adminSession.userId, { fullName, username });
+    adminSession = Auth.toSession(updated);
+    qs('sidebarName').textContent = adminSession.fullName || adminSession.username;
+    qs('sidebarAvatar').textContent = initials(adminSession.fullName || adminSession.username);
+    qs('adminWelcome').textContent = adminSession.fullName || adminSession.username;
+    populateAdminAccountForm();
+    AppUtils.toast('تم تحديث بيانات المدير بنجاح. استخدم اسم المستخدم الجديد عند تسجيل الدخول القادم.');
+  } catch (error) {
+    AppUtils.toast(error.message || 'تعذر تحديث بيانات المدير.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function changeAdminPassword(event) {
+  event.preventDefault();
+  const button = qs('changeAdminPasswordBtn');
+  const currentPassword = qs('adminCurrentPassword').value;
+  const newPassword = qs('adminNewPassword').value;
+  const confirmPassword = qs('adminConfirmPassword').value;
+
+  if (!currentPassword) return AppUtils.toast('أدخل كلمة المرور الحالية.', 'error');
+  if (newPassword.length < 6) return AppUtils.toast('كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف.', 'error');
+  if (newPassword !== confirmPassword) return AppUtils.toast('تأكيد كلمة المرور الجديدة غير مطابق.', 'error');
+  if (currentPassword === newPassword) return AppUtils.toast('اختر كلمة مرور جديدة مختلفة عن الحالية.', 'error');
+
+  button.disabled = true;
+  try {
+    await Auth.changeOwnPassword(currentPassword, newPassword);
+    qs('adminPasswordForm').reset();
+    AppUtils.toast('تم تغيير كلمة مرور المدير بنجاح.');
+  } catch (error) {
+    AppUtils.toast(error.message || 'تعذر تغيير كلمة المرور.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
 function populateReportFilters() {
   const employees = allUsers.filter(user => user.role === 'user');
   const previousUserId = qs('reportUser').value;
@@ -1470,6 +1604,8 @@ async function initAdmin() {
   document.querySelectorAll('[data-open-add-user]').forEach(btn => btn.addEventListener('click', () => openUserModal()));
   document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', () => AppUtils.closeModal(btn.dataset.closeModal)));
   qs('userForm').addEventListener('submit', saveUser);
+  qs('adminProfileForm').addEventListener('submit', saveAdminProfile);
+  qs('adminPasswordForm').addEventListener('submit', changeAdminPassword);
   qs('settingsForm').addEventListener('submit', saveSettings);
   qs('userSearch').addEventListener('input', renderUsersTable);
   qs('statusFilter').addEventListener('change', renderUsersTable);
