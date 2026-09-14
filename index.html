@@ -482,7 +482,7 @@ a { color: inherit; text-decoration: none; }
         </div>
         <div class="topbar-actions">
           <button class="icon-btn" id="refreshBtn" title="تحديث"><i data-lucide="refresh-cw"></i></button>
-          <button class="btn btn-ghost btn-sm" id="logoutBtn"><i data-lucide="log-out"></i> خروج</button>
+          <button class="btn btn-ghost btn-sm" id="logoutBtn"><i data-lucide="log-out"></i> تسجيل الخروج</button>
         </div>
       </header>
 
@@ -609,6 +609,8 @@ a { color: inherit; text-decoration: none; }
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import {
   getAuth,
+  setPersistence,
+  browserLocalPersistence,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
@@ -640,6 +642,10 @@ const firebaseConfig = {
 };
 const firebaseApp = getApps().find(app => app.name === '[DEFAULT]') || initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
+// نحفظ جلسة تسجيل الدخول محليًا حتى تبقى فعالة بعد Refresh أو إغلاق وفتح التبويب.
+const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error('Firebase Auth persistence error:', error);
+});
 const db = getFirestore(firebaseApp);
 
 const COLLECTIONS = Object.freeze({
@@ -943,6 +949,7 @@ const DataService = {
 
 const Auth = {
   async login(username, password) {
+    await authPersistenceReady;
     try {
       const login = await DataService.findLoginByUsername(username);
       if (!login?.loginEmail) throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
@@ -963,7 +970,8 @@ const Auth = {
     }
   },
 
-  waitForAuthUser() {
+  async waitForAuthUser() {
+    await authPersistenceReady;
     return new Promise(resolve => {
       const unsubscribe = onAuthStateChanged(auth, user => {
         unsubscribe();
@@ -973,6 +981,7 @@ const Auth = {
   },
 
   async getSession() {
+    await authPersistenceReady;
     const firebaseUser = auth.currentUser || await this.waitForAuthUser();
     if (!firebaseUser) return null;
     const profile = await DataService.getUserById(firebaseUser.uid);
@@ -1007,6 +1016,7 @@ const Auth = {
   },
 
   async logout() {
+    await authPersistenceReady;
     await signOut(auth);
     location.href = 'index.html';
   },
@@ -1489,6 +1499,7 @@ async function bootAdminPage(){
   const note=document.getElementById('adminFirebaseNote');
   const loginPanel=document.getElementById('adminLoginPanel');
   const setupPanel=document.getElementById('adminSetupPanel');
+  await authPersistenceReady;
   try{
     const bootstrapped=await DataService.isBootstrapped();
     if(!bootstrapped){
