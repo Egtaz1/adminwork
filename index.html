@@ -1,0 +1,1542 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة الإدارة | نظام إدارة أيام العمل</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e6eaf0;
+  --text: #172033;
+  --muted: #6b7280;
+  --primary: #5b5bd6;
+  --primary-dark: #4747bf;
+  --primary-soft: #eeeeff;
+  --success: #139b68;
+  --success-soft: #e9f8f1;
+  --danger: #dc4456;
+  --danger-soft: #fff0f2;
+  --warning: #e69a14;
+  --warning-soft: #fff7e7;
+  --info: #2386d9;
+  --info-soft: #edf6ff;
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, .05), 0 1px 2px rgba(16, 24, 40, .03);
+  --shadow: 0 12px 32px rgba(39, 50, 73, .08);
+  --radius: 18px;
+  --radius-sm: 12px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: 'Cairo', Tahoma, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  min-height: 100vh;
+}
+button, input, select { font: inherit; }
+button { border: 0; }
+a { color: inherit; text-decoration: none; }
+[hidden] { display: none !important; }
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
+  background: var(--surface);
+}
+.login-visual {
+  position: relative;
+  overflow: hidden;
+  padding: 64px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.18), transparent 28%),
+    radial-gradient(circle at 80% 80%, rgba(255,255,255,.12), transparent 30%),
+    linear-gradient(145deg, #3434a7 0%, #5b5bd6 52%, #7373e8 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.login-visual::after {
+  content: '';
+  width: 440px;
+  height: 440px;
+  position: absolute;
+  left: -180px;
+  bottom: -180px;
+  border: 70px solid rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+.brand-lockup { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+.brand-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.22);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+.brand-mark img { width: 100%; height: 100%; object-fit: cover; }
+.brand-mark svg { width: 24px; height: 24px; }
+.brand-title { font-size: 18px; font-weight: 800; }
+.brand-subtitle { font-size: 12px; opacity: .78; margin-top: 2px; }
+.login-hero { max-width: 620px; position: relative; z-index: 1; }
+.login-hero h1 { font-size: clamp(32px, 4vw, 54px); line-height: 1.25; margin: 0 0 18px; letter-spacing: -.5px; }
+.login-hero p { font-size: 17px; line-height: 2; margin: 0; color: rgba(255,255,255,.82); max-width: 580px; }
+.feature-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.feature-chip { padding: 9px 13px; border-radius: 999px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.16); font-size: 12px; }
+.login-foot { position: relative; z-index: 1; font-size: 12px; opacity: .7; }
+.login-form-wrap { display: grid; place-items: center; padding: 48px; background: #fff; }
+.login-card { width: min(100%, 440px); }
+.login-card .mobile-logo { display: none; margin-bottom: 28px; }
+.login-card h2 { margin: 0 0 8px; font-size: 30px; letter-spacing: -.4px; }
+.login-card > p { margin: 0 0 30px; color: var(--muted); line-height: 1.8; }
+.demo-box { margin-top: 22px; background: var(--surface-2); border: 1px dashed #d7dce5; border-radius: 14px; padding: 14px 16px; color: var(--muted); font-size: 12px; line-height: 1.9; }
+
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 13px; font-weight: 700; color: #3f4858; }
+.input-wrap { position: relative; }
+.input-wrap .input-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #97a0af; }
+.input, .select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #dfe4eb;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text);
+  padding: 10px 13px;
+  outline: none;
+  transition: .18s ease;
+}
+.input.has-icon { padding-right: 44px; }
+.input:focus, .select:focus { border-color: #9b9bed; box-shadow: 0 0 0 4px rgba(91,91,214,.10); }
+.input::placeholder { color: #a6adba; }
+.help-text { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+.btn {
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn svg { width: 18px; height: 18px; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 18px rgba(91,91,214,.18); }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary { background: #eef1f6; color: #3c4658; }
+.btn-secondary:hover { background: #e5e9f0; }
+.btn-danger { background: var(--danger-soft); color: var(--danger); }
+.btn-danger:hover { background: #ffe3e7; }
+.btn-ghost { background: transparent; color: #596273; border: 1px solid var(--border); }
+.btn-ghost:hover { background: #f7f8fa; }
+.btn-block { width: 100%; }
+.btn-sm { min-height: 36px; padding: 7px 11px; border-radius: 10px; font-size: 12px; }
+.icon-btn { width: 40px; height: 40px; padding: 0; border-radius: 11px; background: #fff; color: #626c7c; border: 1px solid var(--border); cursor: pointer; display: grid; place-items: center; }
+.icon-btn:hover { background: #f8fafc; }
+.icon-btn svg { width: 18px; height: 18px; }
+
+.app-shell { min-height: 100vh; display: grid; grid-template-columns: 255px 1fr; }
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: #1f2440;
+  color: #fff;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.sidebar .brand-lockup { padding: 4px 8px 24px; }
+.sidebar .brand-mark { width: 42px; height: 42px; border-radius: 13px; }
+.sidebar-nav { display: flex; flex-direction: column; gap: 6px; }
+.nav-section-title { padding: 18px 12px 7px; color: #8f97b7; font-size: 10px; font-weight: 800; letter-spacing: .6px; }
+.nav-link {
+  color: #bfc5dd;
+  border-radius: 11px;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .15s ease;
+}
+.nav-link svg { width: 18px; height: 18px; }
+.nav-link:hover, .nav-link.active { background: rgba(255,255,255,.085); color: #fff; }
+.nav-link.active { box-shadow: inset -3px 0 0 #8e8ef1; }
+.sidebar-spacer { flex: 1; }
+.sidebar-profile { border-top: 1px solid rgba(255,255,255,.08); padding: 16px 8px 0; display: flex; align-items: center; gap: 10px; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(145deg, #7676e7, #5b5bd6); color: #fff; font-size: 13px; font-weight: 800; flex: 0 0 auto; }
+.profile-meta { min-width: 0; }
+.profile-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 700; }
+.profile-role { color: #8f97b7; font-size: 10px; margin-top: 2px; }
+
+.main-wrap { min-width: 0; }
+.topbar {
+  min-height: 70px;
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.topbar-title h1 { font-size: 17px; margin: 0; }
+.topbar-title p { margin: 2px 0 0; color: var(--muted); font-size: 11px; }
+.topbar-actions { display: flex; align-items: center; gap: 9px; }
+.mobile-menu { display: none; }
+.content { padding: 26px 28px 40px; max-width: 1600px; margin: 0 auto; }
+.page-section { display: none; }
+.page-section.active { display: block; animation: sectionIn .18s ease; }
+@keyframes sectionIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 22px; }
+.page-head h2 { margin: 0 0 5px; font-size: 22px; }
+.page-head p { margin: 0; color: var(--muted); font-size: 12px; }
+.page-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); }
+.stat-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.stat-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; }
+.stat-icon svg { width: 20px; height: 20px; }
+.stat-icon.primary { background: var(--primary-soft); color: var(--primary); }
+.stat-icon.success { background: var(--success-soft); color: var(--success); }
+.stat-icon.warning { background: var(--warning-soft); color: var(--warning); }
+.stat-icon.info { background: var(--info-soft); color: var(--info); }
+.stat-icon.danger { background: var(--danger-soft); color: var(--danger); }
+.stat-label { color: var(--muted); font-size: 11px; font-weight: 700; }
+.stat-value { font-size: 23px; font-weight: 800; margin-top: 8px; letter-spacing: -.4px; }
+.stat-note { margin-top: 7px; color: #8b93a2; font-size: 10px; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+.card-header { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.card-header h3 { margin: 0; font-size: 14px; }
+.card-header p { margin: 3px 0 0; font-size: 10px; color: var(--muted); }
+.card-body { padding: 18px; }
+.card-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.card-grid-main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .65fr); gap: 18px; }
+
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.search-box { position: relative; flex: 1; min-width: 220px; max-width: 360px; }
+.search-box svg { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: #9aa2af; }
+.search-box .input { padding-right: 40px; min-height: 42px; }
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-row .select { min-height: 42px; width: auto; min-width: 135px; }
+
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; min-width: 780px; }
+.table th, .table td { text-align: right; padding: 13px 12px; border-bottom: 1px solid #edf0f4; font-size: 12px; vertical-align: middle; }
+.table th { color: #6f7887; background: #fbfcfd; font-size: 10px; font-weight: 800; }
+.table tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover { background: #fcfcfe; }
+.user-cell { display: flex; align-items: center; gap: 10px; min-width: 180px; }
+.user-cell .avatar { width: 34px; height: 34px; font-size: 11px; }
+.user-title { font-weight: 700; }
+.user-sub { color: var(--muted); font-size: 10px; margin-top: 2px; }
+.badge { display: inline-flex; align-items: center; gap: 5px; min-height: 26px; border-radius: 999px; padding: 4px 9px; font-size: 10px; font-weight: 800; }
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge-success { background: var(--success-soft); color: var(--success); }
+.badge-danger { background: var(--danger-soft); color: var(--danger); }
+.badge-info { background: var(--info-soft); color: var(--info); }
+.table-actions { display: flex; gap: 6px; }
+
+.calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.month-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.month-controls .select { width: auto; min-width: 130px; min-height: 40px; }
+.legend { display: flex; gap: 8px; flex-wrap: wrap; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: #6b7280; font-weight: 700; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.legend-dot.normal { background: #f0b429; }
+.legend-dot.friday { background: #3f8efc; }
+.legend-dot.holiday { background: #1aad75; }
+.legend-dot.off { background: #e45362; }
+.legend-dot.none { background: #d9dee7; }
+
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.calendar-head { color: #7d8593; font-size: 10px; font-weight: 800; text-align: center; padding: 6px 2px 10px; }
+.day-card { min-height: 92px; border-radius: 13px; border: 1px solid var(--border); background: #fff; padding: 10px; cursor: pointer; position: relative; transition: .15s ease; text-align: right; color: var(--text); }
+.day-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(31,36,64,.08); border-color: #cfd5df; }
+.day-card.is-today { box-shadow: inset 0 0 0 2px var(--primary); }
+.day-number { font-size: 13px; font-weight: 800; }
+.day-status { position: absolute; bottom: 9px; right: 9px; left: 9px; border-radius: 8px; padding: 5px 6px; font-size: 9px; font-weight: 800; text-align: center; }
+.day-card.state-none .day-status { background: #f2f4f7; color: #7c8491; }
+.day-card.state-normal { border-color: #f0d28f; background: #fffdf6; }
+.day-card.state-normal .day-status { background: #fff4cd; color: #9b6a05; }
+.day-card.state-friday { border-color: #bad8fc; background: #f8fbff; }
+.day-card.state-friday .day-status { background: #e9f3ff; color: #2874c7; }
+.day-card.state-holiday { border-color: #b8e6d3; background: #f7fdfa; }
+.day-card.state-holiday .day-status { background: #e8f8f1; color: #10865b; }
+.day-card.state-off { border-color: #f4c2c9; background: #fff9fa; }
+.day-card.state-off .day-status { background: #ffedf0; color: #c33c4c; }
+.day-empty { min-height: 92px; }
+
+.salary-panel { display: grid; gap: 12px; }
+.salary-line { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; color: #626b7a; }
+.salary-line strong { color: var(--text); font-size: 13px; }
+.salary-divider { height: 1px; background: var(--border); margin: 3px 0; }
+.salary-total { border-radius: 15px; background: linear-gradient(145deg, #303090, #5b5bd6); padding: 16px; color: #fff; margin-top: 3px; }
+.salary-total span { display: block; font-size: 10px; opacity: .75; }
+.salary-total strong { display: block; font-size: 24px; margin-top: 5px; }
+
+.quick-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+.quick-stat { border: 1px solid var(--border); background: #fff; border-radius: 13px; padding: 12px; }
+.quick-stat span { font-size: 9px; color: var(--muted); display: block; }
+.quick-stat strong { font-size: 18px; margin-top: 5px; display: block; }
+
+.empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
+.empty-state svg { width: 38px; height: 38px; margin-bottom: 12px; color: #b5bdc9; }
+.empty-state h4 { color: #4f5969; margin: 0 0 7px; }
+.empty-state p { margin: 0; font-size: 11px; }
+
+.modal { position: fixed; inset: 0; background: rgba(17,24,39,.42); z-index: 100; display: none; align-items: center; justify-content: center; padding: 18px; backdrop-filter: blur(3px); }
+.modal.is-open { display: flex; }
+.modal-dialog { width: min(100%, 520px); max-height: min(90vh, 760px); overflow-y: auto; background: #fff; border-radius: 20px; box-shadow: 0 28px 70px rgba(20,28,48,.24); animation: modalIn .18s ease; }
+.modal-dialog.sm { width: min(100%, 430px); }
+@keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: none; } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
+.modal-header h3 { margin: 0; font-size: 15px; }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 15px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+.status-options { display: grid; gap: 9px; }
+.status-option { border: 1px solid var(--border); border-radius: 13px; padding: 12px 13px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; cursor: pointer; transition: .15s ease; }
+.status-option:hover { border-color: #b9bfca; background: #fafbfc; }
+.status-option .label { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; }
+.status-option .dot { width: 10px; height: 10px; border-radius: 50%; }
+.status-option.active { border-color: #9898e7; box-shadow: 0 0 0 3px rgba(91,91,214,.08); }
+
+.toast-host { position: fixed; top: 18px; left: 18px; display: grid; gap: 8px; z-index: 200; }
+.toast { min-width: 260px; max-width: 380px; background: #fff; border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 13px; padding: 12px 14px; display: flex; align-items: center; gap: 9px; font-size: 11px; transform: translateY(-8px); opacity: 0; transition: .2s ease; }
+.toast.show { transform: none; opacity: 1; }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+.toast-error .toast-dot { background: var(--danger); }
+.toast-warning .toast-dot { background: var(--warning); }
+
+.overlay { display: none; }
+
+@media (max-width: 1180px) {
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card-grid-main { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 920px) {
+  .login-page { grid-template-columns: 1fr; }
+  .login-visual { display: none; }
+  .login-form-wrap { min-height: 100vh; padding: 28px; }
+  .login-card .mobile-logo { display: flex; color: var(--text); }
+  .login-card .mobile-logo .brand-mark { background: var(--primary-soft); color: var(--primary); border: 0; }
+
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar { position: fixed; right: 0; top: 0; z-index: 80; width: 255px; transform: translateX(105%); transition: transform .22s ease; }
+  .sidebar.is-open { transform: translateX(0); }
+  .overlay { position: fixed; inset: 0; background: rgba(17,24,39,.35); z-index: 70; }
+  .overlay.is-open { display: block; }
+  .mobile-menu { display: grid; }
+  .topbar { padding: 0 16px; }
+  .content { padding: 20px 16px 34px; }
+  .card-grid-2 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .page-head { align-items: stretch; flex-direction: column; }
+  .page-actions { width: 100%; }
+  .page-actions .btn { flex: 1; }
+  .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-value { font-size: 19px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: auto; }
+  .calendar-grid { gap: 5px; }
+  .calendar-head { font-size: 8px; }
+  .day-card, .day-empty { min-height: 70px; border-radius: 10px; padding: 7px; }
+  .day-number { font-size: 11px; }
+  .day-status { font-size: 7px; right: 5px; left: 5px; bottom: 5px; padding: 4px 2px; }
+  .quick-stats { grid-template-columns: 1fr 1fr; }
+  .topbar-title p { display: none; }
+  .toast-host { right: 12px; left: 12px; }
+  .toast { min-width: auto; width: 100%; }
+}
+
+
+/* ===== Self-contained two-page additions ===== */
+[hidden]{display:none!important}
+.gate-link{display:inline-flex;align-items:center;gap:7px;margin-top:16px;color:var(--primary);font-weight:800;font-size:12px}
+.firebase-note{margin-top:18px;padding:12px 14px;border:1px solid var(--border);background:var(--surface-2);border-radius:12px;color:var(--muted);font-size:11px;line-height:1.8}
+.firebase-note.error{border-color:#ffc7cd;background:#fff3f5;color:#b42335}
+.firebase-note.success{border-color:#b9ead7;background:#eefbf6;color:#0e7a52}
+.admin-gate .login-card{width:min(100%,520px)}
+.admin-gate .form-grid{grid-template-columns:1fr 1fr}
+.loading-screen{min-height:100vh;display:grid;place-items:center;background:var(--bg);padding:24px}
+.loading-card{background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:26px 30px;text-align:center;min-width:min(420px,90vw)}
+.loading-spinner{width:38px;height:38px;border:4px solid #eceef4;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:700px){.admin-gate .form-grid{grid-template-columns:1fr}.admin-gate .form-group.full{grid-column:auto}}
+</style>
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+
+<main class="login-page admin-gate" id="adminGateView">
+  <section class="login-visual" aria-hidden="true">
+    <div class="brand-lockup"><div class="brand-mark"><img data-brand-logo alt="" hidden><i data-lucide="shield-check"></i></div><div><div class="brand-title" data-app-name>نظام إدارة أيام العمل</div><div class="brand-subtitle">لوحة الإدارة</div></div></div>
+    <div class="login-hero"><h1>إدارة المستخدمين والتقارير من مكان واحد.</h1><p>لوحة المدير مستقلة بالكامل، وتحتوي داخل نفس الملف على إعداد النظام لأول مرة وتسجيل دخول المدير وإدارة المستخدمين.</p><div class="feature-chips"><span class="feature-chip">إضافة المستخدمين</span><span class="feature-chip">التقارير</span><span class="feature-chip">إعدادات النظام</span><span class="feature-chip">Firebase</span></div></div>
+    <div class="login-foot">لوحة المدير — ملف واحد</div>
+  </section>
+  <section class="login-form-wrap">
+    <div class="login-card">
+      <div id="adminLoginPanel" hidden>
+        <h2>دخول المدير</h2><p>أدخل بيانات حساب المدير للوصول إلى لوحة الإدارة.</p>
+        <form id="standaloneAdminLoginForm">
+          <div class="form-group"><label for="adminLoginUsername">اسم المستخدم</label><input class="input" id="adminLoginUsername" autocomplete="username" required></div>
+          <div class="form-group" style="margin-top:16px"><label for="adminLoginPassword">كلمة المرور</label><input class="input" id="adminLoginPassword" type="password" autocomplete="current-password" required></div>
+          <div id="adminLoginError" class="help-text" style="color:var(--danger);min-height:20px;margin-top:10px"></div>
+          <button class="btn btn-primary btn-block" id="adminLoginButton" type="submit"><i data-lucide="log-in"></i> دخول لوحة الإدارة</button>
+        </form>
+        <a class="gate-link" href="index.html"><i data-lucide="arrow-right"></i> العودة إلى دخول المستخدم</a>
+      </div>
+      <div id="adminSetupPanel" hidden>
+        <h2>إعداد النظام</h2><p>أنشئ حساب المدير الرئيسي. هذه الخطوة متاحة مرة واحدة فقط.</p>
+        <form id="standaloneSetupForm">
+          <div class="form-grid">
+            <div class="form-group full"><label for="setupFullName">اسم المدير</label><input class="input" id="setupFullName" placeholder="مثال: إسلام" required></div>
+            <div class="form-group full"><label for="setupUsername">اسم المستخدم</label><input class="input" id="setupUsername" placeholder="admin" autocomplete="username" required></div>
+            <div class="form-group"><label for="setupPassword">كلمة المرور</label><input class="input" id="setupPassword" type="password" minlength="6" autocomplete="new-password" required></div>
+            <div class="form-group"><label for="setupConfirmPassword">تأكيد كلمة المرور</label><input class="input" id="setupConfirmPassword" type="password" minlength="6" autocomplete="new-password" required></div>
+          </div>
+          <div id="adminSetupError" class="help-text" style="color:var(--danger);min-height:20px;margin-top:10px"></div>
+          <button class="btn btn-primary btn-block" id="adminSetupButton" type="submit"><i data-lucide="shield-plus"></i> إنشاء المدير وبدء النظام</button>
+        </form>
+      </div>
+      <div class="firebase-note" id="adminFirebaseNote">جاري التحقق من Firebase...</div>
+    </div>
+  </section>
+</main>
+
+<div id="adminDashboardView" hidden>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark">
+          <img data-brand-logo alt="" hidden>
+          <i data-lucide="calendar-check-2"></i>
+        </div>
+        <div>
+          <div class="brand-title" data-app-name>نظام إدارة أيام العمل</div>
+          <div class="brand-subtitle">لوحة الإدارة</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">الرئيسية</div>
+        <button class="nav-link active" data-section="dashboard"><i data-lucide="layout-dashboard"></i><span>نظرة عامة</span></button>
+        <button class="nav-link" data-section="users"><i data-lucide="users-round"></i><span>إدارة المستخدمين</span></button>
+        <button class="nav-link" data-section="reports"><i data-lucide="chart-no-axes-combined"></i><span>تقارير المستخدمين</span></button>
+
+        <div class="nav-section-title">النظام</div>
+        <button class="nav-link" data-section="settings"><i data-lucide="settings-2"></i><span>إعدادات التطبيق</span></button>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-profile">
+        <div class="avatar" id="sidebarAvatar">م</div>
+        <div class="profile-meta">
+          <div class="profile-name" id="sidebarName">مدير النظام</div>
+          <div class="profile-role">مدير</div>
+        </div>
+      </div>
+    </aside>
+    <div class="overlay" id="sidebarOverlay"></div>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button class="icon-btn mobile-menu" id="menuBtn" aria-label="فتح القائمة"><i data-lucide="menu"></i></button>
+          <div class="topbar-title">
+            <h1 id="topbarTitle">نظرة عامة</h1>
+            <p>تابع المستخدمين والإعدادات من مكان واحد.</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="refreshBtn" title="تحديث"><i data-lucide="refresh-cw"></i></button>
+          <button class="btn btn-ghost btn-sm" id="logoutBtn"><i data-lucide="log-out"></i> خروج</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="page-section active" id="section-dashboard">
+          <div class="page-head">
+            <div><h2>مرحبًا، <span id="adminWelcome">مدير النظام</span></h2><p>ملخص سريع لحالة النظام والمستخدمين.</p></div>
+            <div class="page-actions"><button class="btn btn-primary" data-open-add-user><i data-lucide="user-plus"></i> إضافة مستخدم</button></div>
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-top"><div><div class="stat-label">إجمالي المستخدمين</div><div class="stat-value" id="statUsers">0</div><div class="stat-note">حسابات الموظفين فقط</div></div><div class="stat-icon primary"><i data-lucide="users-round"></i></div></div></div>
+            <div class="stat-card"><div class="stat-top"><div><div class="stat-label">الحسابات النشطة</div><div class="stat-value" id="statActive">0</div><div class="stat-note">يمكنها تسجيل الدخول</div></div><div class="stat-icon success"><i data-lucide="user-check"></i></div></div></div>
+            <div class="stat-card"><div class="stat-top"><div><div class="stat-label">إجمالي صافي الشهر</div><div class="stat-value" id="statNet">0</div><div class="stat-note" id="statMonthLabel">الشهر الحالي</div></div><div class="stat-icon info"><i data-lucide="wallet-cards"></i></div></div></div>
+            <div class="stat-card"><div class="stat-top"><div><div class="stat-label">أيام العمل المسجلة</div><div class="stat-value" id="statWorkDays">0</div><div class="stat-note">عادي + جمعة + عطلات</div></div><div class="stat-icon warning"><i data-lucide="calendar-days"></i></div></div></div>
+          </div>
+
+          <div class="card-grid-main">
+            <div class="card">
+              <div class="card-header"><div><h3>أحدث المستخدمين</h3><p>آخر الحسابات المضافة للنظام</p></div><button class="btn btn-ghost btn-sm" data-goto="users">عرض الكل</button></div>
+              <div class="card-body" style="padding:0;"><div class="table-wrap"><table class="table"><thead><tr><th>المستخدم</th><th>اسم الدخول</th><th>الحالة</th><th>تاريخ الإضافة</th></tr></thead><tbody id="latestUsersBody"></tbody></table></div></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div><h3>ملخص إعدادات الحساب</h3><p>قيم الحساب الأساسية المستخدمة</p></div></div>
+              <div class="card-body salary-panel">
+                <div class="salary-line"><span>سعر اليوم الافتراضي</span><strong id="dashBaseRate">—</strong></div>
+                <div class="salary-line"><span>زيادة الجمعة</span><strong id="dashFridayRate">—</strong></div>
+                <div class="salary-line"><span>زيادة العطلة</span><strong id="dashHolidayRate">—</strong></div>
+                <div class="salary-divider"></div>
+                <button class="btn btn-secondary btn-block" data-goto="settings"><i data-lucide="settings-2"></i> تعديل الإعدادات</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-section" id="section-users">
+          <div class="page-head">
+            <div><h2>إدارة المستخدمين</h2><p>إضافة الحسابات وتعديل بياناتها وإيقافها.</p></div>
+            <div class="page-actions"><button class="btn btn-primary" data-open-add-user><i data-lucide="user-plus"></i> مستخدم جديد</button></div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="toolbar">
+                <div class="search-box"><i data-lucide="search"></i><input class="input" id="userSearch" placeholder="ابحث بالاسم أو اسم المستخدم..."></div>
+                <div class="filter-row"><select class="select" id="statusFilter"><option value="all">كل الحالات</option><option value="active">نشط</option><option value="inactive">موقوف</option></select></div>
+              </div>
+              <div class="table-wrap"><table class="table"><thead><tr><th>المستخدم</th><th>اسم الدخول</th><th>الحالة</th><th>تاريخ الإضافة</th><th>إجراءات</th></tr></thead><tbody id="usersTableBody"></tbody></table></div>
+              <div class="empty-state" id="usersEmpty" hidden><i data-lucide="users"></i><h4>لا توجد نتائج</h4><p>غيّر كلمات البحث أو أضف مستخدمًا جديدًا.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-section" id="section-reports">
+          <div class="page-head"><div><h2>تقارير المستخدمين</h2><p>اختر المستخدم والشهر لمراجعة تفاصيل الاستحقاق.</p></div></div>
+          <div class="card">
+            <div class="card-body">
+              <div class="toolbar">
+                <div class="filter-row">
+                  <select class="select" id="reportUser"></select>
+                  <select class="select" id="reportYear"></select>
+                  <select class="select" id="reportMonth"></select>
+                </div>
+              </div>
+              <div class="quick-stats" style="margin-top:18px;">
+                <div class="quick-stat"><span>أيام عادية</span><strong id="repNormal">0</strong></div>
+                <div class="quick-stat"><span>أيام الجمعة</span><strong id="repFriday">0</strong></div>
+                <div class="quick-stat"><span>العطلات</span><strong id="repHoliday">0</strong></div>
+                <div class="quick-stat"><span>الإجازات</span><strong id="repOff">0</strong></div>
+              </div>
+              <div class="card-grid-2" style="margin-top:16px;">
+                <div class="stat-card"><div class="stat-label">الإجمالي قبل الخصم</div><div class="stat-value" id="repGross">0</div></div>
+                <div class="stat-card"><div class="stat-label">الصافي النهائي</div><div class="stat-value" id="repNet">0</div><div class="stat-note" id="repDiscount">قيمة الخصم: 0</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-section" id="section-settings">
+          <div class="page-head"><div><h2>إعدادات التطبيق</h2><p>تخصيص الهوية وقيم الحساب الافتراضية.</p></div></div>
+          <form id="settingsForm" class="card">
+            <div class="card-header"><div><h3>الهوية وإعدادات الحساب</h3><p>تظهر هذه القيم في جميع صفحات النظام.</p></div></div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group"><label for="settingAppName">اسم التطبيق</label><input class="input" id="settingAppName" required></div>
+                <div class="form-group"><label for="settingCompanyName">اسم الشركة / الجهة</label><input class="input" id="settingCompanyName"></div>
+                <div class="form-group full"><label for="settingLogo">رابط الشعار</label><input class="input" id="settingLogo" type="url" placeholder="https://example.com/logo.png"><div class="help-text">يمكن تركه فارغًا واستخدام أيقونة النظام الافتراضية.</div></div>
+                <div class="form-group"><label for="settingCurrency">العملة</label><input class="input" id="settingCurrency" placeholder="جنيه"></div>
+                <div class="form-group"><label for="settingBaseRate">سعر اليوم الافتراضي</label><input class="input" id="settingBaseRate" type="number" min="0" step="0.01"></div>
+                <div class="form-group"><label for="settingFridayMultiplier">معامل الجمعة</label><input class="input" id="settingFridayMultiplier" type="number" min="1" step="0.01"><div class="help-text">مثال: 1.25 يعني زيادة 25%.</div></div>
+                <div class="form-group"><label for="settingHolidayMultiplier">معامل العطلة</label><input class="input" id="settingHolidayMultiplier" type="number" min="1" step="0.01"><div class="help-text">مثال: 1.50 يعني زيادة 50%.</div></div>
+                <div class="form-group"><label for="settingMinYear">أول سنة متاحة</label><input class="input" id="settingMinYear" type="number" min="2020" max="2100"></div>
+                <div class="form-group"><label for="settingMaxYear">آخر سنة متاحة</label><input class="input" id="settingMaxYear" type="number" min="2020" max="2100"></div>
+              </div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" type="submit"><i data-lucide="save"></i> حفظ الإعدادات</button></div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="userModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header"><h3 id="userModalTitle">إضافة مستخدم</h3><button class="icon-btn" data-close-modal="userModal"><i data-lucide="x"></i></button></div>
+      <form id="userForm">
+        <div class="modal-body">
+          <input type="hidden" id="editUserId">
+          <div class="form-grid">
+            <div class="form-group full"><label for="fullName">الاسم الكامل</label><input class="input" id="fullName" required></div>
+            <div class="form-group"><label for="newUsername">اسم المستخدم</label><input class="input" id="newUsername" required></div>
+            <div class="form-group"><label for="newPassword">كلمة المرور</label><input class="input" id="newPassword" type="password"><div class="help-text" id="passwordHelp">مطلوبة عند إنشاء الحساب.</div></div>
+            <div class="form-group"><label for="userStatus">حالة الحساب</label><select class="select" id="userStatus"><option value="active">نشط</option><option value="inactive">موقوف</option></select></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" type="button" data-close-modal="userModal">إلغاء</button><button class="btn btn-primary" type="submit"><i data-lucide="save"></i> حفظ</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="module">
+'use strict';
+
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+  deleteUser as deleteAuthUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword as updateFirebasePassword
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import {
+  doc,
+  collection,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  writeBatch,
+  serverTimestamp,
+  getFirestore
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+const firebaseConfig = {
+  apiKey: "AIzaSyD7H_YdMFLdFTWEiaiezLM0jDWLDehUnBo",
+  authDomain: "islam-3e848.firebaseapp.com",
+  projectId: "islam-3e848",
+  storageBucket: "islam-3e848.firebasestorage.app",
+  messagingSenderId: "579705552620",
+  appId: "1:579705552620:web:280c60b8266e8d28df6fc9"
+};
+const firebaseApp = getApps().find(app => app.name === '[DEFAULT]') || initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
+const COLLECTIONS = Object.freeze({
+  users: 'workday_users',
+  loginIndex: 'workday_login_index',
+  settings: 'workday_settings',
+  system: 'workday_system'
+});
+
+const DEFAULT_SETTINGS = Object.freeze({
+  appName: 'نظام إدارة أيام العمل',
+  companyName: 'WorkDay Pro',
+  appIcon: '',
+  currency: 'جنيه',
+  defaultBaseRate: 300,
+  normalMultiplier: 1,
+  fridayMultiplier: 1.25,
+  holidayMultiplier: 1.5,
+  minYear: 2026,
+  maxYear: 2035
+});
+
+function cleanString(value, max = 100) {
+  return String(value ?? '').trim().replace(/\s+/g, ' ').slice(0, max);
+}
+
+function normalizeUsername(value) {
+  return cleanString(value, 50).toLocaleLowerCase('ar-EG');
+}
+
+function usernameDocKey(username) {
+  const normalized = normalizeUsername(username);
+  if (!normalized) throw new Error('اسم المستخدم مطلوب.');
+  return encodeURIComponent(normalized);
+}
+
+function createInternalEmail() {
+  const token = (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`).replace(/[^a-zA-Z0-9]/g, '');
+  return `u_${token}@login.workdaypro.app`;
+}
+
+function monthDocId(year, monthIndex) {
+  return `${Number(year)}-${String(Number(monthIndex) + 1).padStart(2, '0')}`;
+}
+
+function timestampToISO(value) {
+  if (!value) return null;
+  if (typeof value.toDate === 'function') return value.toDate().toISOString();
+  if (value instanceof Date) return value.toISOString();
+  return String(value);
+}
+
+function serializeUser(snapshot) {
+  if (!snapshot?.exists()) return null;
+  const data = snapshot.data();
+  return {
+    id: snapshot.id,
+    ...data,
+    createdAt: timestampToISO(data.createdAt),
+    updatedAt: timestampToISO(data.updatedAt)
+  };
+}
+
+function firebaseErrorMessage(error) {
+  const code = error?.code || '';
+  const messages = {
+    'auth/invalid-credential': 'اسم المستخدم أو كلمة المرور غير صحيحة.',
+    'auth/user-disabled': 'هذا الحساب موقوف.',
+    'auth/too-many-requests': 'تمت محاولات كثيرة. حاول مرة أخرى بعد قليل.',
+    'auth/weak-password': 'كلمة المرور يجب ألا تقل عن 6 أحرف.',
+    'auth/email-already-in-use': 'تعذر إنشاء الحساب. جرّب اسم مستخدم آخر.',
+    'auth/network-request-failed': 'تعذر الاتصال بـ Firebase. تحقق من الإنترنت.',
+    'permission-denied': 'ليست لديك صلاحية لتنفيذ هذا الإجراء.',
+    'firestore/permission-denied': 'ليست لديك صلاحية لتنفيذ هذا الإجراء.'
+  };
+  return messages[code] || error?.message || 'حدث خطأ غير متوقع.';
+}
+
+function creatorAuth() {
+  const appName = 'workday-user-creator';
+  const existing = getApps().find(app => app.name === appName);
+  const app = existing || initializeApp(firebaseConfig, appName);
+  return getAuth(app);
+}
+
+const DataService = {
+  async isBootstrapped() {
+    const snap = await getDoc(doc(db, COLLECTIONS.system, 'bootstrap'));
+    return snap.exists();
+  },
+
+  async getSettings() {
+    const snap = await getDoc(doc(db, COLLECTIONS.settings, 'app'));
+    return snap.exists() ? { ...DEFAULT_SETTINGS, ...snap.data() } : { ...DEFAULT_SETTINGS };
+  },
+
+  async saveSettings(settings) {
+    const merged = { ...DEFAULT_SETTINGS, ...(await this.getSettings()), ...settings };
+    await setDoc(doc(db, COLLECTIONS.settings, 'app'), {
+      ...merged,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    return merged;
+  },
+
+  async getUsers() {
+    const snaps = await getDocs(collection(db, COLLECTIONS.users));
+    return snaps.docs.map(serializeUser).sort((a, b) => String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ar'));
+  },
+
+  async getUserById(id) {
+    return serializeUser(await getDoc(doc(db, COLLECTIONS.users, id)));
+  },
+
+  async findLoginByUsername(username) {
+    const key = usernameDocKey(username);
+    const snap = await getDoc(doc(db, COLLECTIONS.loginIndex, key));
+    return snap.exists() ? snap.data() : null;
+  },
+
+  async createUser(payload) {
+    const username = cleanString(payload.username, 50);
+    const normalizedUsername = normalizeUsername(username);
+    const fullName = cleanString(payload.fullName, 100);
+    const password = String(payload.password || '');
+    const key = usernameDocKey(username);
+
+    if (!fullName || !username) throw new Error('الاسم واسم المستخدم مطلوبان.');
+    if (password.length < 6) throw new Error('كلمة المرور يجب ألا تقل عن 6 أحرف.');
+    if ((await getDoc(doc(db, COLLECTIONS.loginIndex, key))).exists()) throw new Error('اسم المستخدم مستخدم بالفعل.');
+
+    const secondaryAuth = creatorAuth();
+    const loginEmail = createInternalEmail();
+    let credential = null;
+
+    try {
+      credential = await createUserWithEmailAndPassword(secondaryAuth, loginEmail, password);
+      const uid = credential.user.uid;
+      const profile = {
+        username,
+        usernameNormalized: normalizedUsername,
+        fullName,
+        role: 'user',
+        active: payload.active !== false,
+        baseRate: Number(payload.baseRate ?? (await this.getSettings()).defaultBaseRate),
+        discountPercent: Number(payload.discountPercent ?? 0),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      const batch = writeBatch(db);
+      batch.set(doc(db, COLLECTIONS.users, uid), profile);
+      batch.set(doc(db, COLLECTIONS.loginIndex, key), { uid, loginEmail });
+      await batch.commit();
+      await signOut(secondaryAuth);
+      return await this.getUserById(uid);
+    } catch (error) {
+      if (credential?.user) {
+        try { await deleteAuthUser(credential.user); } catch (_) { /* best effort rollback */ }
+      }
+      try { await signOut(secondaryAuth); } catch (_) { /* ignore */ }
+      throw new Error(firebaseErrorMessage(error));
+    }
+  },
+
+  async updateUser(id, patch) {
+    const current = await this.getUserById(id);
+    if (!current) throw new Error('المستخدم غير موجود.');
+    if (current.role === 'admin') throw new Error('تعديل حساب المدير الرئيسي غير متاح من هذه الشاشة.');
+
+    const nextFullName = patch.fullName !== undefined ? cleanString(patch.fullName, 100) : current.fullName;
+    const nextUsername = patch.username !== undefined ? cleanString(patch.username, 50) : current.username;
+    const nextNormalized = normalizeUsername(nextUsername);
+    if (!nextFullName || !nextUsername) throw new Error('الاسم واسم المستخدم مطلوبان.');
+
+    const oldKey = usernameDocKey(current.username);
+    const newKey = usernameDocKey(nextUsername);
+    const currentIndexSnap = await getDoc(doc(db, COLLECTIONS.loginIndex, oldKey));
+    if (!currentIndexSnap.exists()) throw new Error('بيانات تسجيل الدخول لهذا المستخدم غير مكتملة.');
+
+    if (newKey !== oldKey && (await getDoc(doc(db, COLLECTIONS.loginIndex, newKey))).exists()) {
+      throw new Error('اسم المستخدم مستخدم بالفعل.');
+    }
+
+    const batch = writeBatch(db);
+    batch.update(doc(db, COLLECTIONS.users, id), {
+      fullName: nextFullName,
+      username: nextUsername,
+      usernameNormalized: nextNormalized,
+      active: patch.active !== undefined ? Boolean(patch.active) : current.active,
+      updatedAt: serverTimestamp()
+    });
+
+    if (newKey !== oldKey) {
+      batch.set(doc(db, COLLECTIONS.loginIndex, newKey), currentIndexSnap.data());
+      batch.delete(doc(db, COLLECTIONS.loginIndex, oldKey));
+    }
+    await batch.commit();
+    return this.getUserById(id);
+  },
+
+  async deleteUser(id) {
+    const target = await this.getUserById(id);
+    if (!target) throw new Error('المستخدم غير موجود.');
+    if (target.role === 'admin') throw new Error('لا يمكن حذف حساب المدير الرئيسي.');
+
+    const monthSnaps = await getDocs(collection(db, COLLECTIONS.users, id, 'months'));
+    const monthDocs = [...monthSnaps.docs];
+
+    // Firestore يضع حدًا لعدد العمليات في الـ batch؛ نحذف الشهور على دفعات آمنة.
+    while (monthDocs.length) {
+      const chunk = monthDocs.splice(0, 400);
+      const monthBatch = writeBatch(db);
+      chunk.forEach(snap => monthBatch.delete(snap.ref));
+      await monthBatch.commit();
+    }
+
+    const finalBatch = writeBatch(db);
+    finalBatch.delete(doc(db, COLLECTIONS.users, id));
+    finalBatch.delete(doc(db, COLLECTIONS.loginIndex, usernameDocKey(target.username)));
+    await finalBatch.commit();
+    return true;
+  },
+
+  async getUserMonth(userId, year, monthIndex) {
+    const id = monthDocId(year, monthIndex);
+    const snap = await getDoc(doc(db, COLLECTIONS.users, userId, 'months', id));
+    return snap.exists() ? { dayStates: {}, ...snap.data() } : { year: Number(year), month: Number(monthIndex) + 1, dayStates: {} };
+  },
+
+  async saveUserMonth(userId, year, monthIndex, dayStates) {
+    const id = monthDocId(year, monthIndex);
+    const payload = {
+      year: Number(year),
+      month: Number(monthIndex) + 1,
+      dayStates: { ...(dayStates || {}) },
+      updatedAt: serverTimestamp()
+    };
+    await setDoc(doc(db, COLLECTIONS.users, userId, 'months', id), payload, { merge: true });
+    return payload;
+  },
+
+  async clearUserMonth(userId, year, monthIndex) {
+    await deleteDoc(doc(db, COLLECTIONS.users, userId, 'months', monthDocId(year, monthIndex)));
+    return { year: Number(year), month: Number(monthIndex) + 1, dayStates: {} };
+  },
+
+  async saveUserPreferences(userId, data) {
+    const baseRate = Math.max(0, Number(data.baseRate || 0));
+    const discountPercent = Math.min(100, Math.max(0, Number(data.discountPercent || 0)));
+    await updateDoc(doc(db, COLLECTIONS.users, userId), {
+      baseRate,
+      discountPercent,
+      updatedAt: serverTimestamp()
+    });
+    return { baseRate, discountPercent };
+  },
+
+  async bootstrapAdmin({ fullName, username, password }) {
+    if (await this.isBootstrapped()) throw new Error('تم إعداد المدير الرئيسي بالفعل.');
+    const normalizedUsername = normalizeUsername(username);
+    const key = usernameDocKey(username);
+    const name = cleanString(fullName, 100);
+    const userNameClean = cleanString(username, 50);
+    if (!name || !userNameClean) throw new Error('أكمل الاسم واسم المستخدم.');
+    if (String(password).length < 6) throw new Error('كلمة المرور يجب ألا تقل عن 6 أحرف.');
+
+    const loginEmail = createInternalEmail();
+    let credential = null;
+    try {
+      credential = await createUserWithEmailAndPassword(auth, loginEmail, password);
+      const uid = credential.user.uid;
+      const batch = writeBatch(db);
+      batch.set(doc(db, COLLECTIONS.system, 'bootstrap'), {
+        adminUid: uid,
+        createdAt: serverTimestamp()
+      });
+      batch.set(doc(db, COLLECTIONS.users, uid), {
+        username: userNameClean,
+        usernameNormalized: normalizedUsername,
+        fullName: name,
+        role: 'admin',
+        active: true,
+        baseRate: DEFAULT_SETTINGS.defaultBaseRate,
+        discountPercent: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      batch.set(doc(db, COLLECTIONS.loginIndex, key), { uid, loginEmail });
+      await batch.commit();
+      await this.saveSettings(DEFAULT_SETTINGS);
+      return await this.getUserById(uid);
+    } catch (error) {
+      if (credential?.user) {
+        try { await deleteAuthUser(credential.user); } catch (_) { /* ignore */ }
+      }
+      throw new Error(firebaseErrorMessage(error));
+    }
+  }
+};
+
+const Auth = {
+  async login(username, password) {
+    try {
+      const login = await DataService.findLoginByUsername(username);
+      if (!login?.loginEmail) throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
+      const credential = await signInWithEmailAndPassword(auth, login.loginEmail, password);
+      const profile = await DataService.getUserById(credential.user.uid);
+      if (!profile) {
+        await signOut(auth);
+        throw new Error('الحساب غير مهيأ داخل النظام.');
+      }
+      if (!profile.active) {
+        await signOut(auth);
+        throw new Error('هذا الحساب موقوف حاليًا.');
+      }
+      return this.toSession(profile);
+    } catch (error) {
+      if (error?.message?.includes('موقوف') || error?.message?.includes('غير مهيأ') || error?.message?.includes('غير صحيحة')) throw error;
+      throw new Error(firebaseErrorMessage(error));
+    }
+  },
+
+  waitForAuthUser() {
+    return new Promise(resolve => {
+      const unsubscribe = onAuthStateChanged(auth, user => {
+        unsubscribe();
+        resolve(user || null);
+      });
+    });
+  },
+
+  async getSession() {
+    const firebaseUser = auth.currentUser || await this.waitForAuthUser();
+    if (!firebaseUser) return null;
+    const profile = await DataService.getUserById(firebaseUser.uid);
+    if (!profile || !profile.active) {
+      await signOut(auth);
+      return null;
+    }
+    return this.toSession(profile);
+  },
+
+  toSession(profile) {
+    return {
+      userId: profile.id,
+      username: profile.username,
+      fullName: profile.fullName,
+      role: profile.role,
+      active: profile.active
+    };
+  },
+
+  async requireRole(role) {
+    const session = await this.getSession();
+    if (!session) {
+      location.replace('index.html');
+      return null;
+    }
+    if (role && session.role !== role) {
+      location.replace(session.role === 'admin' ? 'admin.html' : 'index.html');
+      return null;
+    }
+    return session;
+  },
+
+  async logout() {
+    await signOut(auth);
+    location.href = 'index.html';
+  },
+
+  async changeOwnPassword(currentPassword, newPassword) {
+    const user = auth.currentUser || await this.waitForAuthUser();
+    if (!user?.email) throw new Error('لا توجد جلسة تسجيل دخول صالحة.');
+    if (String(newPassword || '').length < 6) throw new Error('كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف.');
+    try {
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updateFirebasePassword(user, newPassword);
+      return true;
+    } catch (error) {
+      if (error?.code === 'auth/invalid-credential' || error?.code === 'auth/wrong-password') throw new Error('كلمة المرور الحالية غير صحيحة.');
+      throw new Error(firebaseErrorMessage(error));
+    }
+  }
+};
+
+const AppUtils = {
+  arabicMonths: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+  daysOfWeek: ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+  stateMeta: {
+    none: { label: 'لم يعمل', short: 'لم يعمل' },
+    normal: { label: 'يوم عمل عادي', short: 'عادي' },
+    friday: { label: 'عمل يوم الجمعة', short: 'جمعة' },
+    holiday: { label: 'عمل في عطلة', short: 'عطلة' },
+    off: { label: 'إجازة / غياب', short: 'إجازة' }
+  },
+
+  money(value, currency = 'جنيه') {
+    const number = Number(value || 0);
+    return `${new Intl.NumberFormat('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(number)} ${currency}`;
+  },
+
+  number(value) {
+    return new Intl.NumberFormat('ar-EG').format(Number(value || 0));
+  },
+
+  calculateMonth(data, year, monthIndex, settings) {
+    const baseRate = Number(data.baseRate || 0);
+    const discountPercent = Math.max(0, Number(data.discountPercent || 0));
+    const counts = { normal: 0, friday: 0, holiday: 0, off: 0, none: 0 };
+    let gross = 0;
+
+    Object.values(data.dayStates || {}).forEach(state => {
+      if (counts[state] === undefined) return;
+      counts[state] += 1;
+      if (state === 'normal') gross += baseRate * Number(settings.normalMultiplier || 1);
+      if (state === 'friday') gross += baseRate * Number(settings.fridayMultiplier || 1.25);
+      if (state === 'holiday') gross += baseRate * Number(settings.holidayMultiplier || 1.5);
+    });
+
+    const discount = gross * (discountPercent / 100);
+    return { ...counts, gross, discount, net: gross - discount, baseRate, discountPercent, year, monthIndex };
+  },
+
+  escapeHTML(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  },
+
+  toast(message, type = 'success') {
+    let host = document.getElementById('toastHost');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'toastHost';
+      host.className = 'toast-host';
+      document.body.appendChild(host);
+    }
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `<span class="toast-dot"></span><span>${this.escapeHTML(message)}</span>`;
+    host.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 250);
+    }, 3500);
+  },
+
+  openModal(id) {
+    document.getElementById(id)?.classList.add('is-open');
+  },
+
+  closeModal(id) {
+    document.getElementById(id)?.classList.remove('is-open');
+  },
+
+  async applyBranding() {
+    const settings = await DataService.getSettings();
+    document.title = `${document.title.split('|')[0].trim()} | ${settings.appName}`;
+    document.querySelectorAll('[data-app-name]').forEach(el => el.textContent = settings.appName);
+    document.querySelectorAll('[data-company-name]').forEach(el => el.textContent = settings.companyName || settings.appName);
+    document.querySelectorAll('[data-brand-logo]').forEach(img => {
+      if (settings.appIcon) {
+        img.src = settings.appIcon;
+        img.hidden = false;
+      } else {
+        img.hidden = true;
+      }
+    });
+    return settings;
+  },
+
+  initIcons() {
+    if (window.lucide) window.lucide.createIcons();
+  },
+
+  firebaseErrorMessage
+};
+
+'use strict';
+
+let adminSession = null;
+let adminSettings = null;
+let allUsers = [];
+const qs = id => document.getElementById(id);
+
+function initials(name) {
+  return String(name || 'م').trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+}
+
+function formatDate(value) {
+  if (!value) return '—';
+  try {
+    return new Intl.DateTimeFormat('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(value));
+  } catch (_) {
+    return '—';
+  }
+}
+
+function setupNavigation() {
+  const titles = {
+    dashboard: 'نظرة عامة',
+    users: 'إدارة المستخدمين',
+    reports: 'تقارير المستخدمين',
+    settings: 'إعدادات التطبيق'
+  };
+
+  document.querySelectorAll('[data-section]').forEach(button => {
+    button.addEventListener('click', () => openSection(button.dataset.section));
+  });
+  document.querySelectorAll('[data-goto]').forEach(button => {
+    button.addEventListener('click', () => openSection(button.dataset.goto));
+  });
+
+  window.openSection = section => {
+    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('[data-section]').forEach(el => el.classList.toggle('active', el.dataset.section === section));
+    qs(`section-${section}`)?.classList.add('active');
+    qs('topbarTitle').textContent = titles[section] || 'لوحة الإدارة';
+    closeSidebar();
+    if (section === 'reports') refreshReport();
+  };
+}
+
+function openSidebar() {
+  qs('sidebar').classList.add('is-open');
+  qs('sidebarOverlay').classList.add('is-open');
+}
+function closeSidebar() {
+  qs('sidebar').classList.remove('is-open');
+  qs('sidebarOverlay').classList.remove('is-open');
+}
+
+function makeCalcData(user, monthData) {
+  return {
+    baseRate: Number(user.baseRate ?? adminSettings.defaultBaseRate),
+    discountPercent: Number(user.discountPercent ?? 0),
+    dayStates: monthData?.dayStates || {}
+  };
+}
+
+async function loadAdminData() {
+  adminSettings = await DataService.getSettings();
+  allUsers = await DataService.getUsers();
+  await AppUtils.applyBranding();
+  await renderDashboard();
+  renderUsersTable();
+  populateReportFilters();
+  populateSettingsForm();
+  await refreshReport();
+  AppUtils.initIcons();
+}
+
+async function renderDashboard() {
+  const employees = allUsers.filter(user => user.role === 'user');
+  qs('statUsers').textContent = AppUtils.number(employees.length);
+  qs('statActive').textContent = AppUtils.number(employees.filter(user => user.active).length);
+
+  const now = new Date();
+  let totalNet = 0;
+  let workDays = 0;
+
+  const monthResults = await Promise.all(employees.map(async user => {
+    try {
+      const month = await DataService.getUserMonth(user.id, now.getFullYear(), now.getMonth());
+      return AppUtils.calculateMonth(makeCalcData(user, month), now.getFullYear(), now.getMonth(), adminSettings);
+    } catch (error) {
+      console.warn('Failed to load dashboard month for', user.id, error);
+      return null;
+    }
+  }));
+
+  monthResults.filter(Boolean).forEach(result => {
+    totalNet += result.net;
+    workDays += result.normal + result.friday + result.holiday;
+  });
+
+  qs('statNet').textContent = AppUtils.money(totalNet, adminSettings.currency);
+  qs('statWorkDays').textContent = AppUtils.number(workDays);
+  qs('statMonthLabel').textContent = `${AppUtils.arabicMonths[now.getMonth()]} ${now.getFullYear()}`;
+  qs('dashBaseRate').textContent = AppUtils.money(adminSettings.defaultBaseRate, adminSettings.currency);
+  qs('dashFridayRate').textContent = `+${Math.round((Number(adminSettings.fridayMultiplier) - 1) * 100)}%`;
+  qs('dashHolidayRate').textContent = `+${Math.round((Number(adminSettings.holidayMultiplier) - 1) * 100)}%`;
+
+  const latest = [...employees]
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .slice(0, 5);
+
+  qs('latestUsersBody').innerHTML = latest.length ? latest.map(user => `
+    <tr>
+      <td><div class="user-cell"><div class="avatar">${AppUtils.escapeHTML(initials(user.fullName))}</div><div><div class="user-title">${AppUtils.escapeHTML(user.fullName)}</div><div class="user-sub">موظف</div></div></div></td>
+      <td>${AppUtils.escapeHTML(user.username)}</td>
+      <td><span class="badge ${user.active ? 'badge-success' : 'badge-danger'}">${user.active ? 'نشط' : 'موقوف'}</span></td>
+      <td>${formatDate(user.createdAt)}</td>
+    </tr>`).join('') : `<tr><td colspan="4"><div class="empty-state"><h4>لا يوجد مستخدمون بعد</h4><p>أضف أول مستخدم من زر إضافة مستخدم.</p></div></td></tr>`;
+}
+
+function getFilteredUsers() {
+  const search = qs('userSearch').value.trim().toLocaleLowerCase('ar-EG');
+  const status = qs('statusFilter').value;
+  return allUsers.filter(user => user.role === 'user').filter(user => {
+    const fullName = String(user.fullName || '').toLocaleLowerCase('ar-EG');
+    const username = String(user.username || '').toLocaleLowerCase('ar-EG');
+    const matchesSearch = !search || fullName.includes(search) || username.includes(search);
+    const matchesStatus = status === 'all' || (status === 'active' ? user.active : !user.active);
+    return matchesSearch && matchesStatus;
+  });
+}
+
+function renderUsersTable() {
+  const users = getFilteredUsers();
+  const body = qs('usersTableBody');
+  qs('usersEmpty').hidden = users.length > 0;
+
+  body.innerHTML = users.map(user => `
+    <tr>
+      <td><div class="user-cell"><div class="avatar">${AppUtils.escapeHTML(initials(user.fullName))}</div><div><div class="user-title">${AppUtils.escapeHTML(user.fullName)}</div><div class="user-sub">${AppUtils.escapeHTML(user.id)}</div></div></div></td>
+      <td>${AppUtils.escapeHTML(user.username)}</td>
+      <td><span class="badge ${user.active ? 'badge-success' : 'badge-danger'}">${user.active ? 'نشط' : 'موقوف'}</span></td>
+      <td>${formatDate(user.createdAt)}</td>
+      <td><div class="table-actions">
+        <button class="btn btn-ghost btn-sm" data-edit-user="${user.id}"><i data-lucide="pencil"></i> تعديل</button>
+        <button class="btn btn-danger btn-sm" data-delete-user="${user.id}" title="حذف المستخدم من النظام"><i data-lucide="trash-2"></i></button>
+      </div></td>
+    </tr>`).join('');
+
+  body.querySelectorAll('[data-edit-user]').forEach(btn => btn.addEventListener('click', () => openUserModal(btn.dataset.editUser)));
+  body.querySelectorAll('[data-delete-user]').forEach(btn => btn.addEventListener('click', () => deleteUser(btn.dataset.deleteUser)));
+  AppUtils.initIcons();
+}
+
+function openUserModal(userId = '') {
+  const user = allUsers.find(item => item.id === userId);
+  qs('editUserId').value = user?.id || '';
+  qs('fullName').value = user?.fullName || '';
+  qs('newUsername').value = user?.username || '';
+  qs('newPassword').value = '';
+  qs('userStatus').value = user?.active === false ? 'inactive' : 'active';
+  qs('userModalTitle').textContent = user ? 'تعديل المستخدم' : 'إضافة مستخدم جديد';
+
+  if (user) {
+    qs('newPassword').disabled = true;
+    qs('newPassword').placeholder = 'يغيّر المستخدم كلمة مروره من حسابه';
+    qs('passwordHelp').textContent = 'لأمان Firebase، تغيير كلمة المرور يتم من حساب المستخدم نفسه.';
+  } else {
+    qs('newPassword').disabled = false;
+    qs('newPassword').placeholder = '6 أحرف على الأقل';
+    qs('passwordHelp').textContent = 'مطلوبة عند إنشاء الحساب، وبحد أدنى 6 أحرف.';
+  }
+
+  AppUtils.openModal('userModal');
+  setTimeout(() => qs('fullName').focus(), 50);
+}
+
+async function saveUser(event) {
+  event.preventDefault();
+  const id = qs('editUserId').value;
+  const payload = {
+    fullName: qs('fullName').value.trim(),
+    username: qs('newUsername').value.trim(),
+    active: qs('userStatus').value === 'active'
+  };
+  const password = qs('newPassword').value;
+
+  if (!payload.fullName || !payload.username) return AppUtils.toast('أكمل الاسم واسم المستخدم.', 'error');
+  if (!id && password.length < 6) return AppUtils.toast('كلمة المرور يجب ألا تقل عن 6 أحرف.', 'error');
+
+  const submitButton = event.submitter;
+  if (submitButton) submitButton.disabled = true;
+
+  try {
+    if (id) {
+      await DataService.updateUser(id, payload);
+      AppUtils.toast('تم تحديث بيانات المستخدم بنجاح.');
+    } else {
+      await DataService.createUser({ ...payload, password, role: 'user' });
+      AppUtils.toast('تم إنشاء المستخدم وربطه بـ Firebase بنجاح.');
+    }
+    AppUtils.closeModal('userModal');
+    await loadAdminData();
+  } catch (error) {
+    AppUtils.toast(error.message || 'تعذر حفظ المستخدم.', 'error');
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
+}
+
+async function deleteUser(id) {
+  const user = allUsers.find(item => item.id === id);
+  if (!user) return;
+  if (!confirm(`سيتم حذف "${user.fullName}" وبيانات الأشهر الخاصة به من النظام. هل تريد المتابعة؟`)) return;
+
+  try {
+    await DataService.deleteUser(id);
+    AppUtils.toast('تم حذف المستخدم وبياناته من النظام.');
+    await loadAdminData();
+  } catch (error) {
+    AppUtils.toast(error.message || 'تعذر حذف المستخدم.', 'error');
+  }
+}
+
+function populateSettingsForm() {
+  qs('settingAppName').value = adminSettings.appName || '';
+  qs('settingCompanyName').value = adminSettings.companyName || '';
+  qs('settingLogo').value = adminSettings.appIcon || '';
+  qs('settingCurrency').value = adminSettings.currency || 'جنيه';
+  qs('settingBaseRate').value = adminSettings.defaultBaseRate ?? 300;
+  qs('settingFridayMultiplier').value = adminSettings.fridayMultiplier ?? 1.25;
+  qs('settingHolidayMultiplier').value = adminSettings.holidayMultiplier ?? 1.5;
+  qs('settingMinYear').value = adminSettings.minYear ?? 2026;
+  qs('settingMaxYear').value = adminSettings.maxYear ?? 2035;
+}
+
+async function saveSettings(event) {
+  event.preventDefault();
+  const minYear = Number(qs('settingMinYear').value);
+  const maxYear = Number(qs('settingMaxYear').value);
+  if (maxYear < minYear) return AppUtils.toast('آخر سنة يجب أن تكون أكبر من أو تساوي أول سنة.', 'error');
+
+  try {
+    adminSettings = await DataService.saveSettings({
+      appName: qs('settingAppName').value.trim() || 'نظام إدارة أيام العمل',
+      companyName: qs('settingCompanyName').value.trim(),
+      appIcon: qs('settingLogo').value.trim(),
+      currency: qs('settingCurrency').value.trim() || 'جنيه',
+      defaultBaseRate: Math.max(0, Number(qs('settingBaseRate').value || 0)),
+      normalMultiplier: 1,
+      fridayMultiplier: Math.max(1, Number(qs('settingFridayMultiplier').value || 1.25)),
+      holidayMultiplier: Math.max(1, Number(qs('settingHolidayMultiplier').value || 1.5)),
+      minYear,
+      maxYear
+    });
+    await AppUtils.applyBranding();
+    populateReportFilters();
+    await renderDashboard();
+    AppUtils.toast('تم حفظ إعدادات التطبيق على Firebase.');
+  } catch (error) {
+    AppUtils.toast(error.message || 'تعذر حفظ الإعدادات.', 'error');
+  }
+}
+
+function populateReportFilters() {
+  const employees = allUsers.filter(user => user.role === 'user');
+  const previousUserId = qs('reportUser').value;
+  qs('reportUser').innerHTML = employees.length
+    ? employees.map(user => `<option value="${user.id}">${AppUtils.escapeHTML(user.fullName)} — ${AppUtils.escapeHTML(user.username)}</option>`).join('')
+    : '<option value="">لا يوجد مستخدمون</option>';
+  if (employees.some(user => user.id === previousUserId)) qs('reportUser').value = previousUserId;
+
+  const now = new Date();
+  const previousYear = Number(qs('reportYear').value || now.getFullYear());
+  qs('reportYear').innerHTML = '';
+  for (let year = Number(adminSettings.minYear); year <= Number(adminSettings.maxYear); year++) {
+    qs('reportYear').insertAdjacentHTML('beforeend', `<option value="${year}">${year}</option>`);
+  }
+  qs('reportYear').value = String(Math.min(Math.max(previousYear, Number(adminSettings.minYear)), Number(adminSettings.maxYear)));
+
+  if (!qs('reportMonth').options.length) {
+    qs('reportMonth').innerHTML = AppUtils.arabicMonths.map((month, index) => `<option value="${index}">${month}</option>`).join('');
+    qs('reportMonth').value = String(now.getMonth());
+  }
+}
+
+async function refreshReport() {
+  if (!adminSettings) return;
+  const userId = qs('reportUser').value;
+  if (!userId) {
+    ['repNormal', 'repFriday', 'repHoliday', 'repOff'].forEach(id => qs(id).textContent = '0');
+    ['repGross', 'repNet'].forEach(id => qs(id).textContent = AppUtils.money(0, adminSettings.currency));
+    qs('repDiscount').textContent = `قيمة الخصم: ${AppUtils.money(0, adminSettings.currency)}`;
+    return;
+  }
+
+  try {
+    const user = allUsers.find(item => item.id === userId) || await DataService.getUserById(userId);
+    const year = Number(qs('reportYear').value);
+    const monthIndex = Number(qs('reportMonth').value);
+    const month = await DataService.getUserMonth(userId, year, monthIndex);
+    const result = AppUtils.calculateMonth(makeCalcData(user, month), year, monthIndex, adminSettings);
+
+    qs('repNormal').textContent = result.normal;
+    qs('repFriday').textContent = result.friday;
+    qs('repHoliday').textContent = result.holiday;
+    qs('repOff').textContent = result.off;
+    qs('repGross').textContent = AppUtils.money(result.gross, adminSettings.currency);
+    qs('repNet').textContent = AppUtils.money(result.net, adminSettings.currency);
+    qs('repDiscount').textContent = `قيمة الخصم: ${AppUtils.money(result.discount, adminSettings.currency)}`;
+  } catch (error) {
+    AppUtils.toast(error.message || 'تعذر تحميل التقرير.', 'error');
+  }
+}
+
+async function initAdmin() {
+  adminSession = await Auth.requireRole('admin');
+  if (!adminSession) return;
+
+  qs('sidebarName').textContent = adminSession.fullName || adminSession.username;
+  qs('sidebarAvatar').textContent = initials(adminSession.fullName || adminSession.username);
+  qs('adminWelcome').textContent = adminSession.fullName || adminSession.username;
+
+  setupNavigation();
+  qs('menuBtn').addEventListener('click', openSidebar);
+  qs('sidebarOverlay').addEventListener('click', closeSidebar);
+  qs('logoutBtn').addEventListener('click', async () => { await signOut(auth); location.reload(); });
+  qs('refreshBtn').addEventListener('click', async () => {
+    try {
+      await loadAdminData();
+      AppUtils.toast('تم تحديث البيانات.');
+    } catch (error) {
+      AppUtils.toast(error.message || 'تعذر تحديث البيانات.', 'error');
+    }
+  });
+  document.querySelectorAll('[data-open-add-user]').forEach(btn => btn.addEventListener('click', () => openUserModal()));
+  document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', () => AppUtils.closeModal(btn.dataset.closeModal)));
+  qs('userForm').addEventListener('submit', saveUser);
+  qs('settingsForm').addEventListener('submit', saveSettings);
+  qs('userSearch').addEventListener('input', renderUsersTable);
+  qs('statusFilter').addEventListener('change', renderUsersTable);
+  ['reportUser', 'reportYear', 'reportMonth'].forEach(id => qs(id).addEventListener('change', refreshReport));
+
+  document.querySelectorAll('.modal').forEach(modal => modal.addEventListener('click', event => {
+    if (event.target === modal) modal.classList.remove('is-open');
+  }));
+
+  try {
+    await loadAdminData();
+  } catch (error) {
+    console.error(error);
+    AppUtils.toast(error.message || 'تعذر تحميل لوحة الإدارة. تأكد من قواعد Firestore.', 'error');
+  }
+}
+
+
+
+async function showAdminDashboard(){
+  document.getElementById('adminGateView').hidden=true;
+  document.getElementById('adminDashboardView').hidden=false;
+  await initAdmin();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+async function bootAdminPage(){
+  const note=document.getElementById('adminFirebaseNote');
+  const loginPanel=document.getElementById('adminLoginPanel');
+  const setupPanel=document.getElementById('adminSetupPanel');
+  try{
+    const bootstrapped=await DataService.isBootstrapped();
+    if(!bootstrapped){
+      try { const existing=auth.currentUser || await Auth.waitForAuthUser(); if(existing) await signOut(auth); } catch(_) {}
+      setupPanel.hidden=false;
+      note.className='firebase-note';
+      note.textContent='لم يتم إعداد النظام بعد. أنشئ أول مدير الآن.';
+    }else{
+      const session=await Auth.getSession();
+      if(session?.role==='admin'){
+        await showAdminDashboard();
+        return;
+      }
+      if(session) await signOut(auth);
+      loginPanel.hidden=false;
+      note.className='firebase-note success';
+      note.textContent='Firebase متصل. سجل دخول المدير للمتابعة.';
+    }
+    try { await AppUtils.applyBranding(); } catch(_) {}
+  }catch(error){
+    loginPanel.hidden=false;
+    note.className='firebase-note error';
+    note.textContent=error.message || 'تعذر الاتصال بـ Firebase.';
+  }
+  AppUtils.initIcons();
+
+  document.getElementById('standaloneAdminLoginForm').addEventListener('submit',async(event)=>{
+    event.preventDefault(); const btn=document.getElementById('adminLoginButton'); const err=document.getElementById('adminLoginError'); err.textContent=''; btn.disabled=true;
+    try{
+      const session=await Auth.login(document.getElementById('adminLoginUsername').value.trim(),document.getElementById('adminLoginPassword').value);
+      if(session.role!=='admin'){ await signOut(auth); throw new Error('هذا الحساب مستخدم عادي وليس مديرًا.'); }
+      await showAdminDashboard();
+    }catch(error){err.textContent=error.message || 'تعذر تسجيل الدخول.';}finally{btn.disabled=false;}
+  });
+
+  document.getElementById('standaloneSetupForm').addEventListener('submit',async(event)=>{
+    event.preventDefault(); const btn=document.getElementById('adminSetupButton'); const err=document.getElementById('adminSetupError'); err.textContent='';
+    const p=document.getElementById('setupPassword').value, c=document.getElementById('setupConfirmPassword').value;
+    if(p.length<6){err.textContent='كلمة المرور يجب ألا تقل عن 6 أحرف.';return;} if(p!==c){err.textContent='تأكيد كلمة المرور غير مطابق.';return;}
+    btn.disabled=true;
+    try{
+      await DataService.bootstrapAdmin({fullName:document.getElementById('setupFullName').value.trim(),username:document.getElementById('setupUsername').value.trim(),password:p});
+      await showAdminDashboard();
+    }catch(error){err.textContent=error.message || 'تعذر إنشاء المدير. تأكد من قواعد Firestore.';}finally{btn.disabled=false;}
+  });
+}
+document.addEventListener('DOMContentLoaded',bootAdminPage);
+
+</script>
+</body>
+</html>
